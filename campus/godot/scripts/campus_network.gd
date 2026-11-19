@@ -43,7 +43,12 @@ static func build_land(c:Node3D,s:Dictionary):
 			if s.template=="full_mapped_district":cuts.append_array(Geometry2D.offset_polygon(prior,-.02))
 			else:cuts.append(prior)
 	for pond in c.ponds:cuts.append(pond)
-	for building in data().buildings:cuts.append(North.polygon(building.outline))
+	for building in data().buildings:
+		# These old envelopes span open courtyards. Carry the campus substrate
+		# beneath the surveyed wings, their paving and the newly open passages.
+		if str(building.get("osm_way", "")) in ["1135360068", "1135310336"]:
+			continue
+		cuts.append(North.polygon(building.outline))
 	var land=North._pieces(North.polygon(s.polygon),cuts)
 	North._surface(c,land,0,c.mats.grass,"MappedCampusLand_"+s.id)
 	North._solid(c,land,-.75,0,"MappedCampusGround_"+s.id)

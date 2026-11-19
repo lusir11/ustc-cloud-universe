@@ -60,7 +60,7 @@ def run():
        'hardscape':[{'id':'dorm_courtyard','surface':'pavers','polygon':[[-329,615],[-276,615],[-276,637],[-329,637]]},
                     {'id':'service_front','surface':'concrete','polygon':[[-134,647],[-90,647],[-90,658],[-134,658]]}],
        'benches':[[-285,618,1.57],[-318,633,0],[-230,588,0],[-180,626,1.57],[-130,657,0]],
-       'lamps':[[-273.8,556,0],[-273.8,589,0],[-273.8,631,0],[-285,622,0],[-318,631,0],[-88,578,0],[-88,622,0],[-131,657,0]],
+       'lamps':[[-273.8,564.45,0],[-273.8,589,0],[-273.8,631,0],[-285,622,0],[-318,631,0],[-88,578,0],[-88,622,0],[-131,657,0]],
        'walk_routes':[
           {'id':'track_to_south_courts','points':[[-176.76,530],[-176.76,544.88],[-177,550],[-226,550],[-271.19,550.03],[-271.1,589],[-271.1,625]]},
           {'id':'guo_road_to_south_cross','points':[[-78.7,441],[-80.7,517.5],[-82,598.7],[-83.94,667.58],[-175.1,666.77],[-271.08,664.38]]},
@@ -89,6 +89,8 @@ def finish_entrances():
     d=read('godot/data/south_sports.json');manifest=read('godot/assets/south_sports_manifest.json');net=read('godot/data/campus_road_network.json')
     d['hardscape']=[h for h in d['hardscape'] if not h['id'].startswith('entry_')];approaches=[]
     for b in manifest['buildings']:
+        if b['osm_way'] == '1135310336':
+            continue
         p=[b['front_approach'][0],b['front_approach'][2]];choices=[]
         for r in net['roads']:
             for a,c in zip(r['points'],r['points'][1:]):

@@ -83,11 +83,15 @@ static func build(c:Node3D,s:Dictionary):
 			for end in [-fl,fl]:
 				fence(c,ct,point(ct,-fw,end),point(ct,-1.6,end),fence_mat);fence(c,ct,point(ct,1.6,end),point(ct,fw,end),fence_mat)
 	for h in d.hardscape:
+		if h.id == "entry_1135310336":
+			continue
 		var pieces=North._pieces(North.polygon(h.polygon),cuts+court_cuts)
 		North._surface(c,pieces,.105,Surfaces.material(c,h.surface),"SouthHardscape_"+h.id);North._solid(c,pieces,-.1,.105,"SouthForecourt_"+h.id)
 	if OS.has_feature("windows"):
 		preload("res://scripts/sports_photo_details.gd").courtside_seats(c)
 	for b in manifest.buildings:
+		if b.osm_way == "1135310336":
+			continue
 		var p=Vector2(b.front_approach[0],b.front_approach[2]);var nearest=Vector2.ZERO;var best=INF
 		for road in Network.data().roads:
 			if not road.get("build_enabled",true):continue
@@ -98,6 +102,7 @@ static func build(c:Node3D,s:Dictionary):
 		var pieces=North._valid_surface(North._stroke(PackedVector2Array([nearest,p]),2.8),[North.polygon(s.polygon)],cuts+court_cuts)
 		North._surface(c,pieces,.108,Surfaces.material(c,"concrete"),"SouthEntryApproach");North._solid(c,pieces,-.1,.108,"SouthEntryPath")
 	var batches={}
+	d.trees = d.trees.filter(preload("res://scripts/pe_humanities.gd").planting_allowed)
 	for t in d.trees:
 		if not batches.has(t.asset):batches[t.asset]=[]
 		batches[t.asset].append(c.placement(t.position[0],0,t.position[2],Vector3.ONE*t.scale,t.heading))

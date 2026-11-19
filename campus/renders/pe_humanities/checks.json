@@ -1,0 +1,33 @@
+{
+	"checks": {
+		"bridge_deck_supported_above_clearance": true,
+		"campus_ready": true,
+		"capture_a-east-frame": true,
+		"capture_bridge-east": true,
+		"capture_humanities-court": true,
+		"capture_joint-aerial": true,
+		"capture_joint-east": true,
+		"capture_joint-west": true,
+		"capture_pe-north": true,
+		"capture_pe-north-entry": true,
+		"capture_underpass": true,
+		"enter_beneath_east_glazed_oriel": true,
+		"glass_lobby_to_east_road": true,
+		"humanities_wall_blocks": true,
+		"joint_asset_at_campus_coordinates": true,
+		"north_entry_walk_up_steps": true,
+		"north_step_height_1": true,
+		"north_step_height_2": true,
+		"north_step_height_3": true,
+		"old_pe_asset_removed": true,
+		"oriel_open_to_ab_passage": true,
+		"pe_wall_blocks": true,
+		"road_to_east_gate_and_through_glass_lobby": true,
+		"walk_ac_court_18m_east": true,
+		"walk_ac_court_18m_west": true,
+		"walk_full_40m_passage_east": true,
+		"walk_full_40m_passage_west": true
+	},
+	"passed": true,
+	"source_sha256": "06a75ad0ad41eb8d8921e6fb9337a09157211efa932b86c20d3e87eeeb58a252"
+}

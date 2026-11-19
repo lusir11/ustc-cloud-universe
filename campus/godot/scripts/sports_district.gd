@@ -28,8 +28,13 @@ static func build(c:Node3D,s:Dictionary):
 	Network.build_land(c,s)
 	var d=data();var manifest=JSON.parse_string(FileAccess.get_file_as_string("res://assets/sports_district_manifest.json"))
 	for asset in manifest.assets:
+		if asset == "sports_teaching_office":
+			preload("res://scripts/pe_humanities.gd").build(c)
+			continue
 		var model=load("res://assets/"+asset+".glb").instantiate();model.name=asset.to_pascal_case();c.world.add_child(model);c.style(model)
-	for solid in manifest.collision_solids:North._solid(c,[North.polygon(solid.polygon)],solid.bottom,solid.top,"SportsDistrict_"+solid.name)
+	for solid in manifest.collision_solids:
+		if not str(solid.name).begins_with("sports_teaching_office_"):
+			North._solid(c,[North.polygon(solid.polygon)],solid.bottom,solid.top,"SportsDistrict_"+solid.name)
 	var track=North.polygon(d.track.outer_polygon)
 	North._surface(c,[track],.10,sports_material(Color("a55240")),"AthleticRedTrack")
 	North._solid(c,[track],-.1,.10,"AthleticTrackWalkable")
@@ -66,10 +71,14 @@ static func build(c:Node3D,s:Dictionary):
 	var cuts=[]
 	for b in d.buildings:cuts.append(North.polygon(b.outline))
 	for h in d.hardscape:
+		if h.id == "entry_1135360068":
+			continue
 		var pieces=North._pieces(North.polygon(h.polygon),cuts+[track])
 		North._surface(c,pieces,.105,Surfaces.material(c,h.surface),"SportsHardscape_"+h.id)
 		North._solid(c,pieces,-.1,.105,"SportsForecourt_"+h.id)
 	for b in manifest.buildings:
+		if b.osm_way == "1135360068":
+			continue
 		var p=Vector2(b.front_approach[0],b.front_approach[2]);var nearest=Vector2.ZERO;var best=INF
 		for road in Network.data().roads:
 			if not road.get("build_enabled",true):continue
@@ -81,6 +90,7 @@ static func build(c:Node3D,s:Dictionary):
 		North._surface(c,pieces,.108,Surfaces.material(c,"concrete"),"SportsEntryApproach")
 		North._solid(c,pieces,-.1,.108,"SportsEntryPath")
 	var batches={}
+	d.trees = d.trees.filter(preload("res://scripts/pe_humanities.gd").planting_allowed)
 	for t in d.trees:
 		if not batches.has(t.asset):batches[t.asset]=[]
 		batches[t.asset].append(c.placement(t.position[0],0,t.position[2],Vector3.ONE*t.scale,t.heading))

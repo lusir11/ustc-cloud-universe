@@ -169,12 +169,7 @@
       "levels": 4,
       "height": 14.0,
       "source": "https://www.openstreetmap.org/way/1135310336",
-      "confidence": "OSM footprint cross-checked against GIS image and campus plan; storeys and unseen facade details estimated.",
-      "front_approach": [
-        -331.61803609477084,
-        0.1,
-        572.04712020306
-      ]
+      "confidence": "OSM footprint cross-checked against GIS image and campus plan; storeys and unseen facade details estimated."
     },
     {
       "osm_way": "271959067",
@@ -473,8 +468,8 @@
     },
     "south_service_buildings": {
       "file": "south_service_buildings.glb",
-      "surfaces": 30,
-      "triangles": 132392
+      "surfaces": 29,
+      "triangles": 102412
     },
     "south_badminton_hall": {
       "file": "south_badminton_hall.glb",
@@ -839,122 +834,6 @@
       ],
       "bottom": 0.56,
       "top": 0.63
-    },
-    {
-      "name": "south_service_buildings_closed_exterior",
-      "type": "polygon_prism",
-      "polygon": [
-        [
-          -279.97,
-          541.004
-        ],
-        [
-          -279.558,
-          553.144
-        ],
-        [
-          -279.517,
-          554.496
-        ],
-        [
-          -279.095,
-          566.871
-        ],
-        [
-          -298.407,
-          567.125
-        ],
-        [
-          -311.24,
-          567.283
-        ],
-        [
-          -325.25,
-          567.464
-        ],
-        [
-          -338.103,
-          567.631
-        ],
-        [
-          -338.206,
-          555.425
-        ],
-        [
-          -338.222,
-          553.729
-        ],
-        [
-          -338.332,
-          541.611
-        ],
-        [
-          -326.364,
-          541.49
-        ],
-        [
-          -318.369,
-          541.406
-        ],
-        [
-          -306.401,
-          541.284
-        ],
-        [
-          -295.75,
-          541.164
-        ]
-      ],
-      "bottom": 0.08,
-      "top": 14.5
-    },
-    {
-      "name": "south_service_buildings_entry_step_0",
-      "type": "polygon_prism",
-      "polygon": [
-        [
-          -328.70649082640165,
-          567.5289121345623
-        ],
-        [
-          -334.64598949444076,
-          567.6060844894649
-        ],
-        [
-          -334.63325735507976,
-          568.5860017781313
-        ],
-        [
-          -328.69375868704066,
-          568.5088294232287
-        ]
-      ],
-      "bottom": 0.07,
-      "top": 0.32
-    },
-    {
-      "name": "south_service_buildings_entry_step_1",
-      "type": "polygon_prism",
-      "polygon": [
-        [
-          -328.70649082640165,
-          567.5289121345623
-        ],
-        [
-          -334.64598949444076,
-          567.6060844894649
-        ],
-        [
-          -334.6276708041356,
-          569.0159654864237
-        ],
-        [
-          -328.6881721360965,
-          568.9387931315212
-        ]
-      ],
-      "bottom": 0.07,
-      "top": 0.16
     },
     {
       "name": "south_badminton_hall_gym",

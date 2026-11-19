@@ -26,6 +26,9 @@ def tube(a,b,r,mat,n=8):
     geo(vs,[tuple(reversed(range(n))),tuple(range(n,2*n))]+[(k,(k+1)%n,(k+1)%n+n,k+n) for k in range(n)],mat)
 
 for b in data['buildings']:
+    # Built together with the PE department, including its elevated link.
+    if b['osm_way'] == '1135310336':
+        continue
     wid=b['osm_way'];asset='south_dorm364_365' if wid=='271959068' else ('south_badminton_hall' if wid=='271959067' else 'south_service_buildings')
     if signed_area(b["outline"])<0:
         b["outline"].reverse()
