@@ -36,8 +36,16 @@ class Elevation:
 
     def window(self, u, w, low, high, blind=False):
         l, r = u-w/2, u+w/2
-        self.rect("recess", "metal",l,r,-.34,-.29,low,high)
-        self.rect("blue_glass","office_glass",l+.07,r-.07,-.28,-.23,low+.12,high-.14)
+        if self.mesh.materials["office_glass"].get("alphaMode") == "BLEND":
+            for left,right,bottom,top in ((l,l+.07,low,high),(r-.07,r,low,high),
+                                         (l+.07,r-.07,low,low+.12),(l+.07,r-.07,high-.14,high)):
+                self.rect("rebate","metal",left,right,-.34,-.22,bottom,top)
+            pane = [self.point(left,-.24,bottom) for left,bottom in
+                    ((l+.07,low+.12),(r-.07,low+.12),(r-.07,high-.14),(l+.07,high-.14))]
+            self.mesh.face("office_glass",pane)
+        else:
+            self.rect("recess", "metal",l,r,-.34,-.29,low,high)
+            self.rect("blue_glass","office_glass",l+.07,r-.07,-.28,-.23,low+.12,high-.14)
         self.rect("pale_lintel","ivory",l-.03,r+.03,-.13,.055,high-.17,high)
         self.rect("slender_sill","metal",l-.035,r+.035,-.27,.025,low,low+.085)
         self.rect("aluminium_mullion","metal",u-.023,u+.023,-.23,-.19,low+.11,high-.16)
@@ -161,8 +169,13 @@ def entrance(m,e):
     e.rect("access_notice","blue",515.50,515.92,.014,.054,1.16,1.71)
 
 
-def build(m):
+def build(m, north_annex=False):
     m.material("office_glass","#4e6a77",roughness=.24,metallic=.30)
+    if north_annex:
+        m.material("office_glass","#eff5f3",roughness=.085)
+        m.materials["office_glass"].update(alphaMode="BLEND",doubleSided=True)
+        m.materials["office_glass"]["pbrMetallicRoughness"]["baseColorFactor"][3]=.15
+        m.material("annex_plaster","#d5d0c7",roughness=.84)
     m.material("door_glass","#66848a",roughness=.19,metallic=.27)
     m.materials["door_glass"]["alphaMode"]="BLEND"
     m.materials["door_glass"]["pbrMetallicRoughness"]["baseColorFactor"][3]=.34
@@ -172,24 +185,37 @@ def build(m):
     # the actual deep reveals and reveal shadows.
     def core(name,x0,x1,z0,z1,top):
         underside=4.0 if name=="east_spine" else 0.0
-        m.box(name+"_core","brick",((x0+x1)/2,(z0+z1)/2,(top+underside)/2),
-              (x1-x0-.70,z1-z0-.70,top-underside))
+        if north_annex:
+            for h in (.22,4.48,8.04,11.58):
+                if h < top:
+                    m.box(name+"_floor","concrete",((x0+x1)/2,(z0+z1)/2,h-.08),
+                          (x1-x0-.04,z1-z0-.04,.16))
+            if name=="hall":
+                for z in (517.38,524.0):
+                    m.box(name+"_room_divider","annex_plaster",
+                          ((x0+x1)/2,z,top/2),(x1-x0-1.3,.15,top))
+        else:
+            m.box(name+"_core","brick",((x0+x1)/2,(z0+z1)/2,(top+underside)/2),
+                  (x1-x0-.70,z1-z0-.70,top-underside))
         if underside:
             m.box(name+"_vestibule_backing","brick",((x0+x1-3.)/2,(z0+z1)/2,2.),
                   (x1-x0-3.70,z1-z0-.70,4.))
         m.box(name+"_roof","roof",((x0+x1)/2,(z0+z1)/2,top-.02),
               (x1-x0,z1-z0,.14))
         m.solid_box(((x0+x1)/2,(z0+z1)/2,top/2),(x1-x0,z1-z0,top))
-    core("east_spine",-296.35,-287.35,502.,529.77,15.03)
-    core("hall",-321.58,-296.31,512.12,529.67,14.80)
+    hall_east = -315.70 if north_annex else -296.31
+    if not north_annex:
+        core("east_spine",-296.35,-287.35,502.,529.77,15.03)
+    core("hall",-321.58,hall_east,512.12,529.67,14.80)
     core("west_bay",-324.52,-321.55,514.60,529.63,15.20)
     core("northwest_stair",-321.56,-315.70,506.56,512.14,15.72)
-    curved_end(m)
-    east=Elevation(m,"B_east","east",-287.35)
-    east.facade(502,529.77,15.03,
-                [(503.63,1.72),(506.74,1.78),(509.98,1.80),(513.19,1.80),
-                 (516.91,1.76),(520.15,1.80),(523.44,1.78),(526.84,1.78)],(508.,515.4))
-    entrance(m,east)
+    if not north_annex:
+        curved_end(m)
+        east=Elevation(m,"B_east","east",-287.35)
+        east.facade(502,529.77,15.03,
+                    [(503.63,1.72),(506.74,1.78),(509.98,1.80),(513.19,1.80),
+                     (516.91,1.76),(520.15,1.80),(523.44,1.78),(526.84,1.78)],(508.,515.4))
+        entrance(m,east)
     west=Elevation(m,"B_west","west",-324.52)
     west.facade(514.6,529.63,15.20,[(516.61,1.90),(520.14,1.94),(523.78,1.94),(527.37,1.91)])
     # Short returns shade the west projection seen from the parked-car drive.
@@ -197,12 +223,20 @@ def build(m):
         wall=Elevation(m,"B_west_return",side,plane)
         wall.band(-324.52,-321.52,0,15.20,[])
     south=Elevation(m,"B_south","south",529.68)
-    south.facade(-321.57,-296.32,14.80,[(x,1.64) for x in [-319.18,-315.4,-311.68,-307.9,-304.1,-300.42]])
-    south.band(-296.36,-287.35,0,15.03,[])  # A/B bridge lands on this face
-    north=Elevation(m,"B_north","north",512.12)
-    north.facade(-315.70,-296.33,14.8,[(x,1.32) for x in [-313.8,-310.25,-306.55,-302.86,-299.1]])
+    south_end = hall_east if north_annex else -296.32
+    centers = [-319.18,-315.4,-311.68,-307.9,-304.1,-300.42]
+    south.facade(-321.57,south_end,14.80,[(x,1.64) for x in centers if x+.82<south_end])
+    if north_annex:
+        # Exposed return beside the new block's west elevation. Both ends of
+        # the narrow service lane stay open.
+        east=Elevation(m,"B_annex_return","east",hall_east)
+        east.facade(512.12,529.67,14.80,[(515.60,1.32),(519.1,1.32),(522.6,1.32),(526.1,1.32)])
+    else:
+        south.band(-296.36,-287.35,0,15.03,[])  # A/B bridge lands on this face
+        north=Elevation(m,"B_north","north",512.12)
+        north.facade(-315.70,-296.33,14.8,[(x,1.32) for x in [-313.8,-310.25,-306.55,-302.86,-299.1]])
     # Secondary low vestibule and isolated stair tower behind the rounded nose.
-    lx,rx,z0,z1=-315.72,-299.5,508.8,512.22
+    lx,rx,z0,z1=-315.72,(-302.6 if north_annex else -299.5),508.8,512.22
     core("north_vestibule",lx,rx,z0,z1,5.05)
     n=Elevation(m,"B_service","north",z0)
     n.band(lx,rx,0,5.05,[(-311.08,-308.70)])
@@ -223,11 +257,19 @@ def build(m):
     for x in (rx,lx):
         face=Elevation(m,"B_vestibule_end","east" if x==rx else "west",x)
         face.band(z0,z1,0,5.05,[])
+    if north_annex:
+        rear=Elevation(m,"B_vestibule_return","south",z1)
+        rear.band(lx,rx,0,5.05,[])
+        n.rect("department_plaque","ivory",-308.37,-306.72,-.01,.05,1.7,2.18)
+        m.sign("department_name","体育教学部",n.point(-307.545,.055,1.94),1.45,.33,"north","#44382c")
+        n.rect("gym_plaque","stone",-308.37,-307.34,-.01,.05,1.30,1.62)
+        m.sign("gym_plaque","乒乓球馆",n.point(-307.855,.055,1.46),.89,.20,"north","#44382c")
     stair=Elevation(m,"B_stair","north",506.56)
     stair.facade(-321.56,-315.70,15.72,[(-317.26,1.12)])
     side=Elevation(m,"B_stair_west","west",-321.56)
     side.facade(506.56,514.64,15.72,[(510.66,1.39),(513.08,1.24)])
     r=Elevation(m,"B_stair_return","east",-315.7)
     r.band(506.56,512.14,0,15.72,[])
-    e=Elevation(m,"B_courtyard","west",-296.35)
-    e.facade(502.,512.16,15.03,[(504.04,1.53),(507.29,1.55),(510.54,1.53)])
+    if not north_annex:
+        e=Elevation(m,"B_courtyard","west",-296.35)
+        e.facade(502.,512.16,15.03,[(504.04,1.53),(507.29,1.55),(510.54,1.53)])

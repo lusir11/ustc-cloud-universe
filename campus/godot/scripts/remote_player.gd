@@ -3,9 +3,6 @@ extends Node3D
 ## 关键点是 player_avatar.gd 已经暴露了和本地玩家完全一致的接口
 ## animate(speed,vertical,grounded,dt)，所以远端角色不需要新做动画，
 ## 直接拿复制过来的速度/朝向喂给同一个 animate 即可，走路姿势和本地玩家一致。
-##
-## 挂载位置有约束：player_avatar.gd 的 _ready() 里会调用
-## get_parent().get_parent().style(model)，所以本节点必须直接挂在校园根节点下。
 const LERP_RATE=14.0
 
 var avatar:Node3D

@@ -113,7 +113,7 @@ func run():
 		await check_barriers()
 		save_report();return
 	for i in range(90):await process_frame
-	report.checks.visible_avatar=player.avatar.visible and player.avatar.bones.size()>10
+	report.checks.visible_avatar=player.avatar.visible and player.avatar.skeleton.get_bone_count()>10
 	var collider=player.get_child(0)
 	report.collider={"type":collider.shape.get_class(),"height_m":collider.shape.height,"radius_m":collider.shape.radius}
 	report.checks.capsule_body=collider.shape is CapsuleShape3D and player.collision_mask==1
@@ -122,11 +122,11 @@ func run():
 	var origin=player.position
 	Input.action_press("forward");await frames(90)
 	report.walk_speed=Vector2(player.velocity.x,player.velocity.z).length()
-	report.checks.walk=player.position.z-origin.z>3 and absf(report.walk_speed-2.6)<.05 and player.avatar.locomotion=="walk"
+	report.checks.walk=player.position.z-origin.z>3 and absf(report.walk_speed-player.WALK_SPEED)<.05 and player.avatar.locomotion=="walk"
 	await screenshot("02_walking")
 	Input.action_press("jog");await frames(45)
 	report.run_speed=Vector2(player.velocity.x,player.velocity.z).length()
-	report.checks.run=absf(report.run_speed-5.0)<.05 and player.avatar.locomotion=="run"
+	report.checks.run=absf(report.run_speed-player.RUN_SPEED)<.05 and player.avatar.locomotion=="run"
 	Input.action_release("forward");Input.action_release("jog");await frames(25)
 	report.checks.stop=Vector2(player.velocity.x,player.velocity.z).length()<.01 and player.avatar.locomotion=="idle"
 	var apex=player.position.y;var ground=apex;var jumps=player.jump_count
@@ -147,7 +147,7 @@ func run():
 		report.checks[action]=displacement.x>1.4 if action=="left" else displacement.x< -1.4 if action=="right" else displacement.z< -1.4
 	await place(Vector3(0,.15,108),Vector3(0,1,140))
 	Input.action_press("forward");Input.action_press("right");await frames(45)
-	report.checks.diagonal_speed=Vector2(player.velocity.x,player.velocity.z).length()<2.65
+	report.checks.diagonal_speed=Vector2(player.velocity.x,player.velocity.z).length()<player.WALK_SPEED+.05
 	Input.action_release("forward");Input.action_release("right");await frames(15)
 	var old_yaw=player.orbit.rotation.y
 	var mouse=InputEventMouseMotion.new();mouse.screen_relative=Vector2(120,20);player._unhandled_input(mouse)

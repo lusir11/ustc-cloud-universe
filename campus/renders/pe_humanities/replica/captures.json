@@ -1,0 +1,15 @@
+{
+	"checks": {
+		"campus_ready": true,
+		"capture_01-front": true,
+		"capture_02-rear": true,
+		"capture_03-arcade": true,
+		"capture_04-student-walk": true,
+		"capture_05-campus": true,
+		"new_asset_in_active_campus": true,
+		"sightline_across_both_openings": true,
+		"walking_avatar_moved": true
+	},
+	"passed": true,
+	"source_sha256": "73e1f58f32e20c274d9199a50fa772de19489d871fc137982dc2e1b203e3619a"
+}

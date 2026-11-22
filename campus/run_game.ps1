@@ -1,5 +1,5 @@
 param(
-  [switch]$Quality,[switch]$Plaza,[switch]$NorthCampus,[switch]$Library,[switch]$Sports,[switch]$SouthSports,
+  [switch]$Quality,[switch]$Plaza,[switch]$NorthCampus,[switch]$Library,[switch]$Sports,[switch]$SouthSports,[switch]$Humanities,
   [switch]$NetHost,[switch]$Server,[string]$NetJoin='',[string]$NetName='',[int]$NetPort=45888,[switch]$NetSelftest,
   [switch]$Heroes,[string]$AiUrl=''
 )
@@ -17,10 +17,13 @@ New-Item -ItemType Directory -Path $gameLogDir -Force | Out-Null
 
 # Source launches need imported resources; exported Windows builds are independent.
 $sourceProjectPath=Join-Path $PSScriptRoot 'godot'
-$studentSource=Get-Item -LiteralPath (Join-Path $sourceProjectPath 'assets\campus_student.glb')
-$studentCache=Get-ChildItem -Path (Join-Path $sourceProjectPath '.godot\imported\campus_student.glb-*.scn') -File -ErrorAction SilentlyContinue | Select-Object -First 1
-if (-not $studentCache -or $studentCache.LastWriteTimeUtc -lt $studentSource.LastWriteTimeUtc -or
-    -not (Test-Path -LiteralPath (Join-Path $sourceProjectPath '.godot\uid_cache.bin'))) {
+$needsImport = -not (Test-Path -LiteralPath (Join-Path $sourceProjectPath '.godot\uid_cache.bin'))
+foreach ($sceneAsset in 'assets/campus_student.glb','assets/models/humanities_replica.glb','assets/models/pe_north_annex.glb') {
+  $source = Get-Item -LiteralPath (Join-Path $sourceProjectPath $sceneAsset)
+  $cache = Get-ChildItem -LiteralPath (Join-Path $sourceProjectPath '.godot/imported') -Filter ($source.Name+'-*.scn') -File -ErrorAction SilentlyContinue | Select-Object -First 1
+  if (-not $cache -or $cache.LastWriteTimeUtc -lt $source.LastWriteTimeUtc) {$needsImport = $true}
+}
+if ($needsImport) {
   $importLog=Join-Path $gameLogDir 'import.log'
   Write-Host 'Rebuilding Godot import cache for this source project...'
   & $GodotExe --headless --editor --path $sourceProjectPath --import --log-file $importLog
@@ -50,6 +53,7 @@ if ($NorthCampus) {$gameArgs+='--north-campus-focus'}
 if ($Library) {$gameArgs+='--library-focus'}
 if ($Sports) {$gameArgs+='--sports-focus'}
 if ($SouthSports) {$gameArgs+='--south-sports-focus'}
+if ($Humanities) {$gameArgs+='--humanities-focus'}
 if ($NetHost -or $Server) {$gameArgs+="--net-host=$NetPort"}
 elseif ($NetJoin) {$gameArgs+="--net-join=$NetJoin`:$NetPort"}
 # NOTE: only pass --net-name for ASCII names. cmd.exe hands non-ASCII argv to the

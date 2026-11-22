@@ -35,6 +35,8 @@ campus/godot/web/npc_animations/*.res
 /campus/godot/assets/models/humanities_entrance_pot_pot_*.png*
 /campus/godot/assets/models/humanities_ornamental_ornamental_*.jpg*
 /campus/godot/assets/models/humanities_ornamental_ornamental_*.png*
+/campus/godot/assets/models/humanities_replica_*.png*
+/campus/godot/assets/models/pe_north_annex_*.png*
 
 # Local reference sheets and review renders for these buildings.
 /campus/renders/teaching5/
@@ -59,4 +61,3 @@ campus/godot/web/npc_animations/*.res
 /campus/docs/BUILDING_MODELING_WORKFLOW.md
 /campus/tools/capture_humanities_gardens.gd
 /campus/tools/capture_humanities_parking.gd
-/campus/tools/validate_humanities_parking.gd

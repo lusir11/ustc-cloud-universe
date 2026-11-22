@@ -264,11 +264,11 @@
     "mission": "查清体育课程的一项修读要求",
     "prop": "basketball",
     "position": [
-      -307.119,
-      0.11,
-      534.726
+      -307.1,
+      0.028,
+      505.7
     ],
-    "heading": 179.07,
+    "heading": 0.0,
     "location": "体育教学部前步道",
     "phase": 13.97,
     "category": "知识与教学"

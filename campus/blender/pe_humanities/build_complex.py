@@ -87,6 +87,8 @@ class Model:
         self.jpeg_images = set()
         self.textures = {"brick":brick_texture()}
         self.solids = []
+        self.parking = []
+        self.planting = []
         for name,color in COLORS.items():
             self.material(name,color, .22 if "glass" in name else .78, .45 if name in ("steel","gold","glass","glass_dark") else 0)
         self.image_for.update({key:"brick" for key in BRICKS})
@@ -200,7 +202,7 @@ class Model:
         x,y,z=center;w,d,h=size
         self.solid(rectangle(x,y,w,d,angle),z-h/2,z+h/2)
 
-    def save(self,path):
+    def save(self,path,single_mesh=False):
         used=list(dict.fromkeys(mat for _,mat in self.parts))
         doc={"asset":{"version":"2.0","generator":"USTC connected buildings photo model"},"scene":0,"scenes":[{"nodes":[]}],"nodes":[],"meshes":[],
              "materials":[self.materials[key] for key in used],"textures":[],"images":[],"bufferViews":[],"accessors":[]}
@@ -244,6 +246,11 @@ class Model:
             i=len(doc["nodes"]);name=section+"_"+mat.replace("\n","")
             doc["meshes"].append({"name":name,"primitives":[{"attributes":{"POSITION":acc(p,"<f4",5126,"VEC3",34962),"NORMAL":acc(n,"<f4",5126,"VEC3",34962),"TEXCOORD_0":acc(uv,"<f4",5126,"VEC2",34962)},"indices":acc(ix,"<u4",5125,"SCALAR",34963),"material":used.index(mat)}]})
             doc["nodes"].append({"name":name,"mesh":i});doc["scenes"][0]["nodes"].append(i)
+        if single_mesh:
+            primitives=[primitive for mesh in doc["meshes"] for primitive in mesh["primitives"]]
+            doc["meshes"]=[{"name":self.section,"primitives":primitives}]
+            doc["nodes"]=[{"name":self.section,"mesh":0}]
+            doc["scenes"][0]["nodes"]=[0]
         while len(binary)%4:binary.append(0)
         doc["buffers"]=[{"byteLength":len(binary)}]
         js=json.dumps(doc,ensure_ascii=False,separators=(",",":")).encode();js+=b" "*(-len(js)%4)
@@ -303,10 +310,26 @@ def glazed_bridge(m):
         m.solid(outline,-.25,.028)
     paved_lane("underpass_paving",[(-325,529.79),(-282.5,529.79),(-282.5,541.14),(-325,541.14)])
     paved_lane("east_drive",[(-287.29,496.1),(-282.5,496.1),(-282.5,529.79),(-287.29,529.79)])
-    paved_lane("north_forecourt",[(-326.8,497.8),(-322.6,493.7),(-291,493.7),(-282.5,496.1),(-287.29,496.1),(-287.29,512.18),(-296.39,512.18),(-321.62,512.18),(-326.8,508.2)])
+    north_forecourt(m)
+
+
+def north_forecourt(m, north_annex=False):
+    outline = [(-326.8,497.8),(-322.6,493.7),(-291,493.7),(-282.5,496.1)]
+    if north_annex:
+        # Retain the driveway across the north entrance. Its southern edge
+        # follows the new rounded wing with a clear approach to the steps.
+        outline.extend([(-282.5,502.25),(-301.9,502.25),(-301.9,512.18)])
+    else:
+        outline.extend([(-287.29,496.1),(-287.29,512.18),(-296.39,512.18)])
+    outline.extend([(-321.62,512.18),(-326.8,508.2)])
+    m.material("lane_asphalt","#50535a",.94)
+    m.prism("north_forecourt","lane_asphalt",outline,-.025,.028)
+    m.solid(outline,-.25,.028)
     # Rounded planting bed sits in the northwest recess beside the service entry.
     bed=[(-315.45,508.48),(-315.6,505.75),(-315.42,504.9),(-314.9,504.57),(-312.85,504.7),(-312.05,505.22),(-311.79,506.0),(-311.79,508.48)]
     m.prism("north_kerb","stone",bed,.029,.16)
+    if north_annex:
+        m.solid(bed,.028,.19)
     bx,by=-313.7,506.6
     m.material("ground_cover","#52653a",.93)
     m.prism("north_planting","ground_cover",[(bx+(x-bx)*.93,by+(y-by)*.91) for x,y in bed],.16,.22)
@@ -339,5 +362,23 @@ if __name__=="__main__":
         m.section=section;build(m)
     OUTPUT.mkdir(parents=True,exist_ok=True)
     m.save(OUTPUT/"pe_humanities.glb")
-    (OUTPUT/"pe_humanities_collision.json").write_text(json.dumps({"solids":m.solids},separators=(",",":")),encoding="utf8")
+    (OUTPUT/"pe_humanities_collision.json").write_text(json.dumps({
+        "solids":m.solids, "parking":m.parking, "planting":m.planting
+    },separators=(",",":")),encoding="utf8")
     print(f"{len(m.parts)} mesh batches, {sum(len(i[3])//3 for i in m.parts.values())} triangles, {len(m.solids)} colliders")
+    # Beyond close viewing distance a shared silhouette replaces the detailed vehicle.
+    from complex_details import parked_scooter
+    m.parts.clear()
+    m.section = "Distant"
+    m.material("mint", "#91beb3", .32, .16)
+    m.material("cream", "#ead9bc", .38, .11)
+    parked_scooter(m, *ORIGIN, math.pi, "mint")
+    for v in (-.151,.151):
+        for a,b in [((-.80,v,.90),(-.48,v,.90)),((-.80,v,.90),(-.73,v,.68)),
+                    ((-.73,v,.68),(-.47,v,.68)),((-.47,v,.68),(-.48,v,.90))]:
+            m.beam("basket","metal",(ORIGIN[0]+a[0],ORIGIN[1]+a[1],a[2]),(ORIGIN[0]+b[0],ORIGIN[1]+b[1],b[2]),.022)
+    for u in (-.80,-.48):
+        m.box("basket rail","metal",(ORIGIN[0]+u,ORIGIN[1],.90),(.025,.33,.024))
+    m.box("luggage rack","steel",(ORIGIN[0]+.74,ORIGIN[1],.72),(.22,.23,.032))
+    m.box("rear lamp","red",(ORIGIN[0]+.765,ORIGIN[1],.58),(.06,.18,.10))
+    m.save(OUTPUT/"campus_scooter_distant.glb",single_mesh=True)

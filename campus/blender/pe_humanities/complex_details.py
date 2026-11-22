@@ -169,7 +169,7 @@ def parked_scooter(m, cx, cz, yaw, paint):
     body("rear fairing",paint,[(-.76,.37),(-.27,.34),(-.04,.43),(-.12,.65),(-.55,.72),(-.79,.58)],.31)
     body("saddle","rubber",[(-.66,.68),(-.13,.65),(-.08,.71),(-.17,.78),(-.63,.79),(-.72,.74)],.31)
     m.box("footboard","rubber",point(.08,0,.315),(.50,.31,.078),yaw)
-    body("front apron",paint,[(.25,.30),(.38,.31),(.57,.77),(.50,.89),(.40,.84)],.23)
+    body("front apron","cream",[(.25,.30),(.38,.31),(.57,.77),(.50,.89),(.40,.84)],.23)
     for v in (-.079,.079):
         beam("fork","steel",(.55,v,.257),(.48,v,.79),.047)
     beam("steering stem","metal",(.47,0,.73),(.41,0,1.03),.047)
@@ -185,9 +185,6 @@ def passage(m):
     m.material("passage_ceiling", "#49494a", .92)
     m.material("lamp_diffuser","#f1e9ca",.55)
     m.materials["lamp_diffuser"]["emissiveFactor"]=[.40,.38,.29]
-    colors=("#a8bcad","#71605e","#d1c8b2","#66848d","#a496a8")
-    for i,col in enumerate(colors):
-        m.material("scooter_enamel_"+str(i),col,.47,.16)
     # Exposed concrete frames, darker soffit, longitudinal central rib and lights
     # continue west from the glass bridge. Maintain a clear lane at ground level.
     start, end, z = -323.8, -288.1, 535.525
@@ -212,14 +209,17 @@ def passage(m):
             m.box("strip fixture","metal",(x,z+side*1.48,4.047),(.85,.135,.044))
             m.box("linear diffuser","lamp_diffuser",(x,z+side*1.48,4.019),(.77,.077,.018))
     rng=Random(100705)
+    def bay(x, z, yaw, floor):
+        m.parking.append({"position": [x, floor, z], "rotation_y": pi - yaw})
+        m.solid_box((x,z,floor+.46),(1.60,.50,.92),yaw)
     for side,positions in ((-1,[-319.4,-314.0,-312.7,-305.6,-301.2,-296.1,-294.7,-290.7]),
                            (1,[-316.0,-310.8,-309.4,-302.9,-297.8,-292.0])):
         for x in positions:
             y=z+side*(2.12+rng.uniform(-.10,.10))
             yaw=-side*(pi/2+rng.uniform(-.40,.36))
-            parked_scooter(m,x,y,yaw,"scooter_enamel_"+str(rng.randrange(len(colors))))
-            m.solid_box((x,y,.40),(1.48,.48,.71),yaw)
-    for x,z,yaw,paint in [(-283.12,545.5,-.30,0),(-286.2,545.5,-.39,3),
-                           (-330.3,531.7,-.42,1),(-331.65,532.0,-.49,2)]:
-        parked_scooter(m,x,z,yaw,"scooter_enamel_"+str(paint))
-        m.solid_box((x,z,.4),(1.48,.48,.71),yaw)
+            rng.randrange(5)  # Preserve the original parking layout's random sequence.
+            # The easternmost south-side bay overlaps the raised oriel forecourt.
+            bay(x, y, yaw, .041 if x == -292.0 else .028)
+    for x,z,yaw,floor in [(-283.12,545.5,-.30,.041),(-286.2,545.5,-.39,.041),
+                          (-330.3,531.7,-.42,.052),(-331.65,532.0,-.49,.052)]:
+        bay(x, z, yaw, floor)

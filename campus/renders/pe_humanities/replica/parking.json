@@ -1,0 +1,10 @@
+{
+	"bays": 16,
+	"distant_mesh_resources": 1,
+	"lane_clear": true,
+	"layout_sha256": "00cab2fb621b2723ee2afd5de607bae683f0a4012e43f16dff3c8363f3e17b2a",
+	"near_mesh_resources": 1,
+	"passed": true,
+	"vehicle_colliders": 16,
+	"wheel_ground_contacts": 32
+}

@@ -63,6 +63,8 @@ func _ready():
 		player.set_view(Vector3(-187,.16,418),Vector3(-236,2,450))
 	if "--south-sports-focus" in OS.get_cmdline_user_args():
 		player.set_view(Vector3(-236,.16,589),Vector3(-207,1.5,607))
+	if "--humanities-focus" in OS.get_cmdline_user_args():
+		player.set_view(Vector3(-258.0,.24,539.8),Vector3(-283.5,4.5,535.525))
 	spot_label.text="老北门 · 眼镜湖 · 一教 · 广场 · 五教 · 图书馆 · 运动场 · 东侧住宅 · 校史馆 · 南部科研区"
 	reflectable(player.avatar)
 	for n in world.get_children():
@@ -412,7 +414,6 @@ func _on_peer_left(id:int)->void:
 
 func _on_peer_state(id:int,state:Array)->void:
 	if not remote_peers.has(id):
-		# 必须挂在校园根节点下：player_avatar.gd 里会调用 get_parent().get_parent().style()
 		var remote:Node3D=preload("res://scripts/remote_player.gd").new()
 		remote.name="Remote_%d" % id
 		add_child(remote)

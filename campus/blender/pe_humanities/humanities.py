@@ -446,6 +446,9 @@ def build(m):
         m.prism(name+'_kerb','humanities_sill',outline,.055,.141)
         m.prism(name+'_soil','court_soil',[(x+(xx-x)*(1-.06/rx),z+(zz-z)*(1-.06/rz))
                                            for xx,zz in outline],.140,.151)
+        if name in ('CourtBorder','RearTreeBed'):
+            # These beds receive the reference-modelled plants in Blender and Godot.
+            return
         rng=Random(1513+seed)
         long_x=rx>=rz
         length,breadth=(rx,rz) if long_x else (rz,rx)
@@ -460,6 +463,8 @@ def build(m):
                 cross=breadth*(.61*row+rng.uniform(-.12,.12))
                 xx=x+(longitudinal if long_x else cross)
                 zz=z+(cross if long_x else longitudinal)
+                if name=='GatePlanting' and (xx-(east-.11))**2+(zz-548.28)**2 < .48**2:
+                    continue
                 height=rng.uniform(.40,.75)*envelope*(1.09 if row==0 else .86)
                 start=rng.uniform(0,2*pi)
                 for k in range(3):
@@ -484,8 +489,30 @@ def build(m):
             (-324.48,-317.26,553.01,.80),(-316.20,-308.31,552.94,.73),
             (-307.05,-300.51,553.02,.83),(-299.17,-290.63,553.06,.88),
             (-289.50,-287.02,552.94,.77),(-284.09,-280.02,553.04,.84))
+    def specimen(kind,x,z,base,scale,yaw):
+        m.planting.append({"kind":kind,"position":[round(x,4),base,round(z,4)],
+                           "scale":round(scale,4),"rotation_y":round(yaw,6)})
+        # The gate stays walkable between pots. Only hard pots and trunks
+        # get obstacles; the leaves overhanging each flower bed remain soft.
+        trunk={'ornamental':(.074,1.1),'background_tree':(.17,2.4),'entrance_pot':(.166,.34)}
+        if kind in trunk:
+            radius,height=trunk[kind]
+            m.solid([(x+scale*radius*cos(i*pi/6),z+scale*radius*sin(i*pi/6))
+                     for i in range(12)],base,base+height*scale)
+
     for j,(x0,x1,zz,rz) in enumerate(beds):
         planting('CourtBorder',(x0+x1)/2,zz,(x1-x0)/2,rz,j)
+        rng=Random(8307+j)
+        count=max(1,round((x1-x0)/2.03))
+        spacing=(x1-x0)/count
+        for i in range(count):
+            specimen('courtyard_shrub', x0+spacing*(i+.5)+rng.uniform(-.09,.09),
+                     zz+(.14 if zz<555 else 0)+rng.uniform(-.075,.075), .151, rng.uniform(.76,1.02),
+                     rng.uniform(-pi,pi))
+
+    # Garden canopy at the rear approach, offset from the central glass doors.
+    planting('RearTreeBed',-337.28,557.94,1.4,.87,49)
+    specimen('background_tree',-337.28,557.94,.151,1.34,.1584)
 
     def shrub(x,z,height,radius,seed):
         rng=Random(seed)
@@ -508,11 +535,15 @@ def build(m):
 
     shrub(gx+3.35,ass+1.02,2.80,1.16,11)
     shrub(gx+2.63,cn-.98,1.45,.74,18)
-    shrub(east-.20,ass-1.95,3.50,1.30,20)
+    # The ornamental tree takes the indicated place between two right-hand piers.
+    specimen('ornamental',east-.12,548.28,.151,1.0,.92)
     shrub(east-.37,cn+1.61,2.10,.90,12)
     # C and the research institute plaque are at the south edge of the entrance.
     px = east+1.12
     north, south = ass+1.87, cn-.47
+    # Matched pots flank the opening, forward of the signs and off the through route.
+    for zz,yaw in ((north+.96,.35),(south-.96,-.57)):
+        specimen('entrance_pot',px+.64,zz,.05,1.12,yaw)
     gate_pitch = 1.23
     for anchor,direction,count,label in (
         (south,1,2,'科技人文高等研究院'),

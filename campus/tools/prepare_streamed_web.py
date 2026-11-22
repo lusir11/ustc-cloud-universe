@@ -18,6 +18,7 @@ manifest=json.loads((PROJECT/'web/regions.json').read_text(encoding='utf-8'))
 if manifest.get('terrain_enabled'):
     assert manifest['terrain_sha256']==hashlib.sha256((PROJECT/'data/terrain_height.json').read_bytes()).hexdigest(), 'Terrain changed after region bake; rebake first'
 selected={'res://scenes/campus_web.tscn','res://web/regions.json','res://assets/ambient_study_walk.glb'}
+selected.add('res://assets/campus_student.glb')
 selected.add('res://web/region_fetch.js')
 selected.add('res://web/engine_assets.js')
 selected.add('res://web/text_input.js')
