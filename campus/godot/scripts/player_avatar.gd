@@ -1,41 +1,48 @@
-extends "res://scripts/ambient_actor.gd"
-## Reuses the ordinary student mesh. Only this instance loses the reading prop.
-var phase=0.0
-var blend=0.0
-var locomotion="idle"
+extends Node3D
 
-func _ready():
-	var model=preload("res://assets/ambient_study_walk.glb").instantiate()
+const STUDENT_MODEL: PackedScene = preload("res://assets/campus_student.glb")
+const MOVEMENT = preload("res://scripts/player.gd")
+
+var locomotion: StringName = &"idle"
+var animator: AnimationPlayer
+var skeleton: Skeleton3D
+
+
+func _ready() -> void:
+	var model: Node3D = STUDENT_MODEL.instantiate()
+	model.rotation.y = PI # glTF character front is +Z; the player moves toward -Z.
 	add_child(model)
-	model.scale=Vector3.ONE*1.12
-	model.position.y=.04
-	prepare()
-	bones.Book.hide()
-	get_parent().get_parent().style(model)
+	# glTF COLOR_0 multiplies base color. The scene importer can leave this off
+	# even when the skinned mesh contains the painted skin tones.
+	for instance: MeshInstance3D in model.find_children("*", "MeshInstance3D", true, false):
+		var mesh := instance.mesh as ArrayMesh
+		for surface in mesh.get_surface_count():
+			var material := mesh.surface_get_material(surface) as StandardMaterial3D
+			if material and mesh.surface_get_format(surface) & Mesh.ARRAY_FORMAT_COLOR:
+				material.vertex_color_use_as_albedo = true
+	skeleton = model.find_children("*", "Skeleton3D", true, false)[0]
+	animator = model.find_children("*", "AnimationPlayer", true, false)[0]
+	animator.callback_mode_process = AnimationMixer.ANIMATION_CALLBACK_MODE_PROCESS_MANUAL
+	for clip in [&"idle", &"walk", &"run"]:
+		animator.get_animation(clip).loop_mode = Animation.LOOP_LINEAR
+	animator.play(locomotion)
+	animator.advance(0.0)
 
-func animate(speed:float,vertical:float,grounded:bool,dt:float):
-	_restore()
-	blend=move_toward(blend,clampf(speed/2.6,0,1),dt*7)
-	phase+=speed*dt*3.5
-	var stride=sin(phase)*blend
-	locomotion="idle" if speed<.12 else "run" if speed>3.3 else "walk"
-	if not grounded:locomotion="jump" if vertical>0 else "fall"
-	if grounded:
-		bones.Human.position.y+=absf(stride)*.016
-		bones.Torso.rotation.x=-.025*speed
-		for side in ["L","R"]:
-			var wave=stride*(1 if side=="L" else -1)
-			bones["Leg"+side].rotation.x=wave*.50
-			bones["Knee"+side].rotation.x=-maxf(0,-wave)*.65
-			bones["Foot"+side].rotation.x=-wave*.20
-			bones["Arm"+side].rotation.x=-wave*.38
-			bones["Arm"+side].rotation.z=.06*(1 if side=="L" else -1)
-			bones["Fore"+side].rotation.x=-.14-absf(wave)*.22
-	else:
-		for side in ["L","R"]:
-			bones["Leg"+side].rotation.x=.35
-			bones["Knee"+side].rotation.x=-.70
-			bones["Foot"+side].rotation.x=.20
-			bones["Arm"+side].rotation.x=-.65
-			bones["Arm"+side].rotation.z=.18*(1 if side=="L" else -1)
-			bones["Fore"+side].rotation.x=-.35
+
+func animate(speed: float, vertical: float, grounded: bool, dt: float) -> void:
+	var next: StringName = &"idle"
+	var rate := 1.0
+	if not grounded:
+		next = &"jump" if vertical > 0.0 else &"fall"
+	elif speed > (MOVEMENT.WALK_SPEED + MOVEMENT.RUN_SPEED) * 0.5:
+		next = &"run"
+		rate = clampf(speed / MOVEMENT.RUN_SPEED, 0.7, 1.25)
+	elif speed > 0.12:
+		next = &"walk"
+		rate = clampf(speed / MOVEMENT.WALK_SPEED, 0.55, 1.3)
+
+	if next != locomotion:
+		locomotion = next
+		animator.play(next, 0.13)
+	animator.speed_scale = rate
+	animator.advance(dt)

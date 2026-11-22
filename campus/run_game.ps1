@@ -17,7 +17,9 @@ New-Item -ItemType Directory -Path $gameLogDir -Force | Out-Null
 
 # Source launches need imported resources; exported Windows builds are independent.
 $sourceProjectPath=Join-Path $PSScriptRoot 'godot'
-if (-not (Test-Path -LiteralPath (Join-Path $sourceProjectPath '.godot\imported')) -or
+$studentSource=Get-Item -LiteralPath (Join-Path $sourceProjectPath 'assets\campus_student.glb')
+$studentCache=Get-ChildItem -Path (Join-Path $sourceProjectPath '.godot\imported\campus_student.glb-*.scn') -File -ErrorAction SilentlyContinue | Select-Object -First 1
+if (-not $studentCache -or $studentCache.LastWriteTimeUtc -lt $studentSource.LastWriteTimeUtc -or
     -not (Test-Path -LiteralPath (Join-Path $sourceProjectPath '.godot\uid_cache.bin'))) {
   $importLog=Join-Path $gameLogDir 'import.log'
   Write-Host 'Rebuilding Godot import cache for this source project...'

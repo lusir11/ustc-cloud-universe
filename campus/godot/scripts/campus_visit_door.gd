@@ -45,9 +45,14 @@ func build(spec: Dictionary, opening_width: float, palette: Dictionary) -> void:
 		elif spec.panel == "wood":
 			for y in [.57, 1.84]:
 				_panel(leaf,Vector3(center,y,-.038),Vector3(half-.17,.48,.027),palette.inset)
-		var handle_x := -side * (half-.17)
 		for face in [-1,1]:
-			_panel(leaf,Vector3(handle_x,1.07,.064*face),Vector3(.035,.44,.038),palette.handle)
+			if spec.get("pull","") == "full_height":
+				var edge_x := -side * (half-.043)
+				_panel(leaf,Vector3(edge_x,height*.5,.057*face),Vector3(.022,height-.12,.074),palette.handle)
+				_panel(leaf,Vector3(edge_x+side*.018,height*.5,.096*face),Vector3(.055,height-.12,.015),palette.handle)
+			else:
+				var handle_x := -side * (half-.17)
+				_panel(leaf,Vector3(handle_x,1.07,.064*face),Vector3(.035,.44,.038),palette.handle)
 	_pose()
 
 

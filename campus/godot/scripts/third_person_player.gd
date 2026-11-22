@@ -1,7 +1,5 @@
 extends "res://scripts/player.gd"
 
-const WALK_SPEED=5.2
-const RUN_SPEED=10.0
 const GRAVITY=16.0
 const JUMP_SPEED=5.6
 var orbit:Node3D

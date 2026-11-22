@@ -12,8 +12,9 @@
     "depth": 6.4,
     "style": "teaching",
     "doors": [
-      {"id": "west-a", "offset": -0.07, "span": 0.133, "height": 2.37, "outset": -0.05, "panel": "silver", "motion": "hinged"},
-      {"id": "west-b", "offset": 0.07, "span": 0.133, "height": 2.37, "outset": -0.05, "panel": "silver", "motion": "hinged"}
+      {"id": "west-a", "offset": -0.07, "span": 0.133, "height": 2.37, "outset": -0.05, "panel": "silver", "motion": "hinged", "pull": "full_height"},
+      {"id": "west-b", "offset": 0.07, "span": 0.133, "height": 2.37, "outset": -0.05, "panel": "silver", "motion": "hinged", "pull": "full_height"},
+      {"id": "west-c", "offset": 0.21, "span": 0.133, "height": 2.37, "outset": -0.05, "panel": "silver", "motion": "hinged", "pull": "full_height"}
     ]
   },
   {

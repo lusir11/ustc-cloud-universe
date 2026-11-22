@@ -2,6 +2,8 @@ extends CharacterBody3D
 
 const WALK=1.8
 const JOG=4.2
+const WALK_SPEED = 5.2
+const RUN_SPEED = 10.0
 var camera:Camera3D
 var pitch=0.0
 var free_camera=false

@@ -3,6 +3,7 @@ extends Node3D
 const Walker=preload("res://scripts/player.gd")
 const ArtShader=preload("res://shaders/academic.gdshader")
 const PHOTO_TILE_SIZES := {
+	"PhotoTeaching5RoseTile":Vector2(.105,.105),
 	"PhotoAuditStone":Vector2(.66,.48),"PhotoAuditSoffit":Vector2(1.14,.75),
 	"PhotoActivityBrick":Vector2(.23,.105),"PhotoActivityStone":Vector2(1.15,.60),
 	"PhotoArchiveBrick":Vector2(.32,.15),"PhotoLibraryStone":Vector2(.91,.52),

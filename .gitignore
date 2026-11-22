@@ -3,6 +3,8 @@
 **/.pytest_cache/
 **/.venv/
 **/models/
+# Game models and their import settings are part of the playable project.
+!/campus/godot/assets/models/
 **/logs/
 **/knowledge/raw/
 .env
@@ -19,3 +21,42 @@ campus/godot/web/regions/*.scn
 campus/godot/web/shared/*.res
 campus/godot/web/regions/*.bin
 campus/godot/web/npc_animations/*.res
+
+# Textures extracted on import from the teaching building, scooters and plants.
+# Each pattern also covers the extracted image's .import sidecar.
+/campus/godot/assets/north_teaching5_PhotoTeaching5RoseTile_tiles.png*
+/campus/godot/assets/north_teaching5_Teaching5EntryIvory_tiles.png*
+/campus/godot/assets/north_teaching5_teaching5_facade_samples.jpg*
+/campus/godot/assets/north_teaching5_teaching5_ivy.png*
+/campus/godot/assets/models/campus_scooter_scooter_leather_*.png*
+/campus/godot/assets/models/humanities_background_tree_tree_*.jpg*
+/campus/godot/assets/models/humanities_background_tree_tree_*.png*
+/campus/godot/assets/models/humanities_courtyard_shrub_shrub_*.png*
+/campus/godot/assets/models/humanities_entrance_pot_pot_*.png*
+/campus/godot/assets/models/humanities_ornamental_ornamental_*.jpg*
+/campus/godot/assets/models/humanities_ornamental_ornamental_*.png*
+
+# Local reference sheets and review renders for these buildings.
+/campus/renders/teaching5/
+/campus/renders/pe_humanities/campus_scooter/
+/campus/renders/pe_humanities/planting/
+/campus/references/Photographic_data/公共素材/模型/*.png
+/campus/references/Photographic_data/建筑/CB10_新人文楼／人文与社会科学学院/多视图/0[1-5]-*视图.png
+
+# Offline authoring files for the exported teaching building, scooters and plants.
+/campus/blender/source/teaching5_wangpu.blend
+/campus/blender/source/teaching5_facade_samples.jpg
+/campus/blender/source/teaching5_ivy.png
+/campus/blender/scripts/sample_teaching5_windows.py
+/campus/blender/scripts/teaching5_facades.py
+/campus/blender/pe_humanities/campus_scooter.blend
+/campus/blender/pe_humanities/*scooter*.py
+/campus/blender/pe_humanities/photograph_parking.py
+/campus/blender/pe_humanities/textures/scooter_leather_*.png
+/campus/blender/pe_humanities/planting/
+
+# Production notes and capture tools specific to this modeling pass.
+/campus/docs/BUILDING_MODELING_WORKFLOW.md
+/campus/tools/capture_humanities_gardens.gd
+/campus/tools/capture_humanities_parking.gd
+/campus/tools/validate_humanities_parking.gd
