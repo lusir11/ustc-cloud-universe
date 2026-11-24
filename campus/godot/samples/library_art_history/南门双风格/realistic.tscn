@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://samples/anime_library/courtyard.gd" id="1"]
+
+[node name="AnimeLibraryCourtyard" type="Node3D"]
+script = ExtResource("1")
+realistic = true

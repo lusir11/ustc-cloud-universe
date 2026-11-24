@@ -61,3 +61,17 @@ campus/godot/web/npc_animations/*.res
 /campus/docs/BUILDING_MODELING_WORKFLOW.md
 /campus/tools/capture_humanities_gardens.gd
 /campus/tools/capture_humanities_parking.gd
+
+# Offline research images and previous local-only map layout.
+/docs/东区模型核对/
+/campus/references/Photographic_data/公共素材/校园地图/东区模型核对/东区官方参考全图-small.jpg
+/campus/references/Photographic_data/公共素材/校园地图/东区模型核对/东区官方参考全图.jpg
+/campus/references/Photographic_data/公共素材/校园地图/东区模型核对/东区开发分区/东区校园开发分区卫星图.jpg
+/campus/references/Photographic_data/公共素材/校园地图/东区模型核对/官方地图核对/官方原图.jpg
+/campus/references/Photographic_data/公共素材/校园地图/东区模型核对/官方地图核对/校图图面校正.jpg
+/campus/references/Photographic_data/公共素材/校园地图/东区模型核对/官方地图核对/配准前后对照.jpg
+/campus/references/Photographic_data/公共素材/校园地图/东区模型核对/官方斜视参考-small.jpg
+/campus/references/Photographic_data/公共素材/校园地图/东区模型核对/官方斜视参考.jpg
+/campus/references/Photographic_data/公共素材/校园地图/东区模型核对/手工检查.jpg
+/campus/references/Photographic_data/公共素材/贴图/天空参考/sky-source.jpg
+/campus/references/library_art_history/南门双风格/写实校园/sky-source.jpg
