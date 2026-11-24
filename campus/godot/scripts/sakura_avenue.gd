@@ -49,11 +49,52 @@ static func low_bark(c:Node3D,asset:String)->ConcavePolygonShape3D:
 				for j in range(1,clipped.size()-1):faces.append(clipped[0]);faces.append(clipped[j]);faces.append(clipped[j+1])
 	var shape=ConcavePolygonShape3D.new();shape.backface_collision=true;shape.set_faces(faces);return shape
 
+const SPECIMENS = {
+	Vector2(7.15, 113.0): "sakura_tree_as06_01",
+	Vector2(7.15, 123.0): "sakura_tree_as06_tall",
+	Vector2(7.15, 130.45): "sakura_tree_as06_anime",
+}
+
+static func plant_specimen(c:Node3D, asset:String, placement:Transform3D):
+	# Keep the authored blossom texture and bark/leaf vertex colours.
+	var tree:Node3D = load("res://assets/" + asset + ".glb").instantiate()
+	var parts = []
+	c.asset_parts(tree, Transform3D.IDENTITY, parts)
+	for part in parts:
+		for surface in part.mesh.get_surface_count():
+			var mat := part.mesh.surface_get_material(surface) as StandardMaterial3D
+			if mat == null:
+				continue
+			if part.mesh.surface_get_format(surface) & Mesh.ARRAY_FORMAT_COLOR:
+				mat.vertex_color_use_as_albedo = true
+			elif mat.resource_name == "AS06_AnimeFlowerSprays":
+				var painted := ShaderMaterial.new()
+				painted.shader = preload("res://shaders/as06_anime_canopy.gdshader")
+				painted.set_shader_parameter("sprays", mat.albedo_texture)
+				part.mesh.surface_set_material(surface, painted)
+			elif mat.albedo_texture:
+				# Let light pass through thin petals in the shadowed lower crown.
+				mat.backlight_enabled = true
+				mat.backlight = Color(0.22,0.14,0.16)
+				mat.emission_enabled = true
+				mat.emission_operator = BaseMaterial3D.EMISSION_OP_MULTIPLY
+				mat.emission = Color(0.95,0.77,0.80)
+				mat.emission_texture = mat.albedo_texture
+				mat.emission_energy_multiplier = 0.10
+	c.asset_cache[asset] = parts
+	tree.transform = placement * tree.transform
+	c.world.add_child(tree)
+	c.instance_count += 1
+
 static func build(c:Node3D):
 	if not enabled():return
 	var first=c.world.get_child_count()
 	var rng=RandomNumberGenerator.new();rng.seed=20260405
 	var batches=[[],[],[]];var points=[]
+	var assets=["sakura_tree_0","sakura_tree_1","sakura_tree_2"]
+	for asset in SPECIMENS.values():
+		assets.append(asset)
+		batches.append([])
 	# Existing research coordinates retained; only the tree geometry/scale changes.
 	for tree in North.layout().trees:
 		var p=Vector2(tree[0],tree[1])
@@ -66,11 +107,19 @@ static func build(c:Node3D):
 		if in_segment(entrance) and safe(c,entrance,.55):points.append(entrance)
 	for i in points.size():
 		var p:Vector2=points[i];var sc=rng.randf_range(1.04,1.16)
-		batches[i%3].append(c.placement(p.x,0,p.y,Vector3(sc,sc*rng.randf_range(.93,1.05),sc),rng.randf()*TAU))
+		var placement = c.placement(p.x,0,p.y,Vector3(sc,sc*rng.randf_range(.93,1.05),sc),rng.randf()*TAU)
+		if SPECIMENS.has(p):
+			batches[assets.find(SPECIMENS[p])].append(c.placement(p.x,0,p.y,Vector3.ONE,0))
+		else:
+			batches[i%3].append(placement)
 	var contacts=[];var bark_records=[]
-	for variant in range(3):
-		var asset="sakura_tree_"+str(variant);c.multimesh_batch(asset,batches[variant])
+	for variant in batches.size():
 		if batches[variant].is_empty():continue
+		var asset:String = assets[variant]
+		if variant >= 3:
+			plant_specimen(c,asset,batches[variant][0])
+		else:
+			c.multimesh_batch(asset,batches[variant])
 		var shape=low_bark(c,asset)
 		for tr in batches[variant]:
 			var body=StaticBody3D.new();body.name="SakuraBarkContact";body.transform=tr;c.world.add_child(body)

@@ -18,7 +18,7 @@ New-Item -ItemType Directory -Path $gameLogDir -Force | Out-Null
 # Source launches need imported resources; exported Windows builds are independent.
 $sourceProjectPath=Join-Path $PSScriptRoot 'godot'
 $needsImport = -not (Test-Path -LiteralPath (Join-Path $sourceProjectPath '.godot\uid_cache.bin'))
-foreach ($sceneAsset in 'assets/campus_student.glb','assets/models/humanities_replica.glb','assets/models/pe_north_annex.glb') {
+foreach ($sceneAsset in 'assets/sakura_tree_as06_01.glb','assets/sakura_tree_as06_tall.glb','assets/sakura_tree_as06_anime.glb','assets/campus_student.glb','assets/models/humanities_replica.glb','assets/models/pe_north_annex.glb') {
   $source = Get-Item -LiteralPath (Join-Path $sourceProjectPath $sceneAsset)
   $cache = Get-ChildItem -LiteralPath (Join-Path $sourceProjectPath '.godot/imported') -Filter ($source.Name+'-*.scn') -File -ErrorAction SilentlyContinue | Select-Object -First 1
   if (-not $cache -or $cache.LastWriteTimeUtc -lt $source.LastWriteTimeUtc) {$needsImport = $true}
